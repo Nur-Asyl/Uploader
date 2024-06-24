@@ -2,7 +2,7 @@
 Accepts json of parameters and file to upload to the db
 
 ### example json:
-```json
+```
 {
   "db_table": "db table name with scheme e.g. public.users",
   "field_row": (start field row in file e.g. 3)(int64),

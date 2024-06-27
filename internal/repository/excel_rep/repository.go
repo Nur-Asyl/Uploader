@@ -1,10 +1,10 @@
 package excel_rep
 
 import (
-	"Manual_Parser/internal/domain/data_json"
+	"Manual_Parser/internal/domain"
+	"Manual_Parser/internal/domain/data_excel"
 	"context"
 	"database/sql"
-	"errors"
 	"github.com/xuri/excelize/v2"
 	"log/slog"
 	"strconv"
@@ -19,21 +19,20 @@ func NewExcelRepo(db *sql.DB) *ExcelRepo {
 	return &ExcelRepo{db: db}
 }
 
-func (r *ExcelRepo) Upload(ctx context.Context, f *excelize.File, reqData data_json.RequestData, dto map[string]string) error {
-	slog.Info("Getting sheet name")
+func (r *ExcelRepo) Upload(ctx context.Context, f *excelize.File, reqData data_excel.RequestExcel, dto map[string]string) error {
+	slog.Info("Receiving sheet name")
 	sheetIndex, err := f.GetSheetIndex(reqData.SheetName)
 	if err != nil {
 		slog.Error("Failed to get Sheet Name")
 		return err
 	}
 	slog.Info("Sheet", "index", sheetIndex, "name", reqData.SheetName)
-	slog.Info("Getting rows")
+	slog.Info("Receiving rows")
 	rows, err := f.GetRows(f.GetSheetName(sheetIndex))
 	if err != nil {
 		slog.Error("Error reading Excel sheet", "error", err)
 		return err
 	}
-	slog.Info("Received rows", "length", len(rows))
 
 	fieldRow := rows[reqData.FieldRow-1]
 	slog.Info("fields", "row", fieldRow)
@@ -57,7 +56,7 @@ func (r *ExcelRepo) Upload(ctx context.Context, f *excelize.File, reqData data_j
 		}
 
 		if len(queryFields) == 0 {
-			return errors.New("Failed to find appropriate fields")
+			return domain.ErrNoFields
 		}
 
 		queryString := "INSERT INTO " + reqData.DBTable + " (" + strings.Join(queryFields, ", ") + ") " + "VALUES (" + strings.Join(queryValues, ", ") + ")"
@@ -75,6 +74,6 @@ func (r *ExcelRepo) Upload(ctx context.Context, f *excelize.File, reqData data_j
 		slog.Info("INSERTED:", "row", i)
 	}
 
-	slog.Info("Successfully Uploaded!!!")
+	slog.Info("Successfully Uploaded!!!", "total rows in file", len(rows))
 	return nil
 }

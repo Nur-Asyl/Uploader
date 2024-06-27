@@ -13,34 +13,32 @@ type Storage struct {
 	db *sql.DB
 }
 
-var lock = &sync.Mutex{}
+var (
+	once           sync.Once
+	singleInstance *Storage
+)
 
-var singleInstance *Storage
-
-func Connect(cfg *configs.Config) (*Storage, error) {
-	if singleInstance == nil {
-		lock.Lock()
-		defer lock.Unlock()
-		slog.Info("Creating single instance of postgreSQL")
-		connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-			cfg.Host, cfg.DBPort, cfg.User, cfg.Password, cfg.DBName)
+func Connect(cfg *configs.Config) *Storage {
+	once.Do(func() {
+		connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+			cfg.Database.Host, cfg.Database.Port, cfg.Database.User, cfg.Database.Password, cfg.Database.Name, cfg.Database.SSLMode)
 
 		db, err := sql.Open("postgres", connStr)
 		if err != nil {
-			return nil, err
+			slog.Error("Failed to connect to the Database", "error", err)
+			panic(err)
 		}
 
 		err = db.Ping()
 		if err != nil {
-			return nil, err
+			slog.Error("Failed to Ping", "error", err)
+			panic(err)
 		}
 
-		return &Storage{db: db}, nil
-	} else {
-		slog.Info("Connecting to single instance of postgreSQL")
-	}
+		singleInstance = &Storage{db: db}
+	})
 
-	return singleInstance, nil
+	return singleInstance
 }
 
 func (s *Storage) GetDB() *sql.DB {

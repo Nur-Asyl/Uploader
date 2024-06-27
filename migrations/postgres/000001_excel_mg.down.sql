@@ -1,2 +1,4 @@
 
-DROP TABLE IF EXISTS public_sources.kgd14;
+DROP TABLE IF EXISTS public_sources.kfm03;
+
+DROP TABLE IF EXISTS public_sources.practiceXML;

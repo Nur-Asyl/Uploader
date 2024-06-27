@@ -1,30 +1,52 @@
 package configs
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+	"log/slog"
+	"strings"
+	"sync"
+)
 
 type Config struct {
-	Host     string
-	Port     string
-	DBPort   string
-	User     string
-	Password string
-	DBName   string
+	Server   *server
+	Database *database
 }
 
-func NewConfig() (*Config, error) {
-	viper.SetConfigFile("configs/config.yaml")
-	if err := viper.ReadInConfig(); err != nil {
-		return nil, err
-	}
+type server struct {
+	Port string
+}
 
-	cfg := &Config{
-		Host:     viper.GetString("database.host"),
-		Port:     viper.GetString("server.port"),
-		DBPort:   viper.GetString("database.port"),
-		User:     viper.GetString("database.user"),
-		Password: viper.GetString("database.password"),
-		DBName:   viper.GetString("database.name"),
-	}
+type database struct {
+	Host     string
+	Port     string
+	User     string
+	Password string
+	Name     string
+	SSLMode  string
+}
 
-	return cfg, nil
+var (
+	once           sync.Once
+	configInstance *Config
+)
+
+func GetConfig() *Config {
+	once.Do(func() {
+		viper.SetConfigFile("configs/config.yaml")
+		viper.AutomaticEnv()
+		viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+		if err := viper.ReadInConfig(); err != nil {
+			slog.Error("Failed to read in config", "error", err)
+			panic(err)
+		}
+
+		if err := viper.Unmarshal(&configInstance); err != nil {
+			slog.Error("Failed to unmarshal config", "error", err)
+			panic(err)
+		}
+
+	})
+
+	return configInstance
 }

@@ -4,26 +4,32 @@ import (
 	"Manual_Parser/configs"
 	"Manual_Parser/internal/delivery/http_v1"
 	"Manual_Parser/internal/repository/excel_rep"
+	"Manual_Parser/internal/repository/xml_rep"
 	"Manual_Parser/internal/use_case/excel_uc"
+	"Manual_Parser/internal/use_case/xml_uc"
 	"Manual_Parser/pkg/storages"
-	"log"
+	"log/slog"
 )
 
 func main() {
-	cfg, err := configs.NewConfig()
-	if err != nil {
-		log.Fatalf("Failed to load configuration")
-	}
+	slog.Info("Loading config")
+	cfg := configs.GetConfig()
 
-	storage, err := storages.Connect(cfg)
-	if err != nil {
-		log.Fatalf("Failed to connect to Database", err)
-	}
-	log.Println("Successfully connected to Database")
+	slog.Info("Connecting to the Database")
+	storage := storages.Connect(cfg)
+	slog.Info("Successfully connected to the Database", "DB driver", storage.GetDB().Driver())
 
+	slog.Info("Setting repositories")
 	excelRepo := excel_rep.NewExcelRepo(storage.GetDB())
-	excelUC := excel_uc.NewExcelUseCase(excelRepo)
+	xmlRepo := xml_rep.NewXMLRepo(storage.GetDB())
 
-	deliveryHTTP := http_v1.NewUploadHTTPDelivery(excelUC)
+	slog.Info("Setting usecases")
+	excelUC := excel_uc.NewExcelUseCase(excelRepo)
+	xmlUC := xml_uc.NewXMLUseCase(xmlRepo)
+
+	slog.Info("Setting deliveries")
+	deliveryHTTP := http_v1.NewUploadHTTPDelivery(excelUC, xmlUC)
+
+	slog.Info("Running delivery")
 	deliveryHTTP.Run(cfg)
 }

@@ -172,7 +172,7 @@ func (d *UploadHTTPDelivery) UploadXMLHandler(w http.ResponseWriter, r *http.Req
 	}
 	defer file.Close()
 
-	slog.Info("Decoding xml file", "file", file.Name())
+	slog.Info("Decoding xml file")
 	rootExist := false
 	dec := xml.NewDecoder(file)
 	for t, err := dec.Token(); t != nil; t, err = dec.Token() {

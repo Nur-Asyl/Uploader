@@ -22,6 +22,7 @@ func NewXMLRepo(db *sql.DB) *XMLRepo {
 }
 
 func (r *XMLRepo) Upload(ctx context.Context, dto map[string]data_xml.Tag, req data_xml.RequestXML, rows [][]data_xml.TagValue) error {
+	inserted := 0
 	queryFields := make([]string, 0)
 	queryValues := make([]string, 0)
 	queryParams := make([]interface{}, 0)
@@ -50,6 +51,8 @@ func (r *XMLRepo) Upload(ctx context.Context, dto map[string]data_xml.Tag, req d
 			if !domain.IsDataTypeError(err.Error()) {
 				return err
 			}
+		} else {
+			inserted++
 		}
 
 		queryFields = nil
@@ -60,7 +63,7 @@ func (r *XMLRepo) Upload(ctx context.Context, dto map[string]data_xml.Tag, req d
 		slog.Info("INSERTED:", "row", i+1)
 	}
 
-	slog.Info("Successfully Uploaded!!!", "total rows in file", len(rows))
+	slog.Info("Successfully Uploaded!!!", "Total", len(rows), "Inserted", inserted)
 
 	return nil
 }

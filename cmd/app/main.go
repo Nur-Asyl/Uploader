@@ -17,7 +17,7 @@ func main() {
 
 	slog.Info("Connecting to the Database")
 	storage := storages.Connect(cfg)
-	slog.Info("Successfully connected to the Database", "DB driver", storage.GetDB().Driver())
+	slog.Info("Successfully connected to the Database")
 
 	slog.Info("Setting repositories")
 	excelRepo := excel_rep.NewExcelRepo(storage.GetDB())

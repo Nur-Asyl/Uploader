@@ -19,14 +19,14 @@ func NewXMLUseCase(uploader adapters.XMLUploader) *XMLUseCase {
 	return &XMLUseCase{uploader: uploader}
 }
 
-func (uc *XMLUseCase) Upload(ctx context.Context, rootNode data_xml.Node, req data_xml.RequestXML) error {
+func (uc *XMLUseCase) Upload(ctx context.Context, rootNode data_xml.Node, req data_xml.RequestXML) (*data_xml.ResponseXML, error) {
 	dto := make(map[string]data_xml.Tag)
 	for _, tag := range req.Tags {
 		key := utils.SaltKey(tag.Tag, tag.Parent)
 		_, ok := dto[key]
 		if ok {
 			slog.Error("Already exists such tag", "tag", tag)
-			return errors.New(fmt.Sprintf("Already exists such tag: %+v", tag.Tag))
+			return nil, errors.New(fmt.Sprintf("Already exists such tag: %+v", tag.Tag))
 		} else {
 			dto[key] = data_xml.Tag{
 				DB:     tag.DB,
@@ -43,12 +43,13 @@ func (uc *XMLUseCase) Upload(ctx context.Context, rootNode data_xml.Node, req da
 	uc.getRows(rootNode, dto, &row, &rows)
 
 	if len(rows) == 0 {
-		return domain.ErrZeroRows
+		return nil, domain.ErrZeroRows
 	}
-	if err := uc.uploader.Upload(ctx, dto, req, rows); err != nil {
-		return err
+	res, err := uc.uploader.Upload(ctx, dto, req, rows)
+	if err != nil {
+		return nil, err
 	}
-	return nil
+	return res, nil
 }
 
 // recursively iterates through xml and appends to the rows the data that appropriate for request's DTO

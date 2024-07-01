@@ -5,6 +5,7 @@ import (
 	"Manual_Parser/internal/domain"
 	"Manual_Parser/internal/domain/data_excel"
 	"Manual_Parser/internal/domain/data_xml"
+	"Manual_Parser/internal/middleware/cors_mw"
 	"Manual_Parser/internal/use_case"
 	"context"
 	"encoding/json"
@@ -102,12 +103,20 @@ func (d *UploadHTTPDelivery) UploadExcelFileHandler(w http.ResponseWriter, r *ht
 	}
 	defer file.Close()
 
-	if err := d.excelUC.Upload(ctx, file, requestData); err != nil {
+	res, err := d.excelUC.Upload(ctx, file, requestData)
+	if err != nil {
 		slog.Error("Failed to upload file", "error:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	slog.Info("File uploaded and read successfully", "File", fheader.Filename, "Size", fheader.Size, "Header", fheader.Header)
+
+	err = json.NewEncoder(w).Encode(*res)
+	if err != nil {
+		slog.Error("Failed to encode excel response", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -193,8 +202,16 @@ func (d *UploadHTTPDelivery) UploadXMLHandler(w http.ResponseWriter, r *http.Req
 					return
 				}
 
-				if err := d.xmlUC.Upload(ctx, rootNode, req); err != nil {
+				res, err := d.xmlUC.Upload(ctx, rootNode, req)
+				if err != nil {
 					slog.Error("Failed to upload xml", "error", err)
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+
+				err = json.NewEncoder(w).Encode(*res)
+				if err != nil {
+					slog.Error("Failed to encode xml response", "error", err)
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
 				}
@@ -217,8 +234,8 @@ func (d *UploadHTTPDelivery) Run(cfg *configs.Config) {
 	addr := fmt.Sprintf(":%s", cfg.Server.Port)
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/upload/excel", d.UploadExcelFileHandler)
-	mux.HandleFunc("/upload/xml", d.UploadXMLHandler)
+	mux.HandleFunc("/upload/excel", cors_mw.CORS(d.UploadExcelFileHandler))
+	mux.HandleFunc("/upload/xml", cors_mw.CORS(d.UploadXMLHandler))
 
 	go func() {
 		if err := http.ListenAndServe(addr, mux); err != nil {

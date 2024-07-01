@@ -8,9 +8,9 @@ import (
 )
 
 type ExcelUseCase interface {
-	Upload(ctx context.Context, f *excelize.File, reqData data_excel.RequestExcel) error
+	Upload(ctx context.Context, f *excelize.File, reqData data_excel.RequestExcel) (*data_excel.ResponseExcel, error)
 }
 
 type XMLUseCase interface {
-	Upload(ctx context.Context, rootNode data_xml.Node, reqData data_xml.RequestXML) error
+	Upload(ctx context.Context, rootNode data_xml.Node, reqData data_xml.RequestXML) (*data_xml.ResponseXML, error)
 }

@@ -10,3 +10,9 @@ type RequestExcel struct {
 		Field string `json:"field"`
 	} `json:"fields"`
 }
+
+type ResponseExcel struct {
+	Total      int64
+	Inserted   int64
+	FailedRows string
+}

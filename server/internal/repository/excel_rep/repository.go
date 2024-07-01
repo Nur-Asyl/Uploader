@@ -19,29 +19,31 @@ func NewExcelRepo(db *sql.DB) *ExcelRepo {
 	return &ExcelRepo{db: db}
 }
 
-func (r *ExcelRepo) Upload(ctx context.Context, f *excelize.File, req data_excel.RequestExcel, dto map[string]string) error {
+func (r *ExcelRepo) Upload(ctx context.Context, f *excelize.File, req data_excel.RequestExcel, dto map[string]string) (*data_excel.ResponseExcel, error) {
 	slog.Info("Receiving sheet name")
 	sheetIndex, err := f.GetSheetIndex(req.SheetName)
 	if err != nil {
 		slog.Error("Failed to get Sheet Name")
-		return err
+		return nil, err
 	}
 	slog.Info("Sheet", "index", sheetIndex, "name", req.SheetName)
 	slog.Info("Receiving rows")
 	rows, err := f.GetRows(f.GetSheetName(sheetIndex))
 	if err != nil {
 		slog.Error("Error reading Excel sheet", "error", err)
-		return err
+		return nil, err
 	}
 
 	fieldRow := rows[req.FieldRow-1]
 	slog.Info("fields", "row", fieldRow)
 
-	inserted := 0
+	inserted := int64(0)
+	total := int64(len(rows[req.DataRow-1:]))
 	queryFields := make([]string, 0)
 	queryValues := make([]string, 0)
 	queryParams := make([]interface{}, 0)
 	valueCount := 1
+	failedRows := ""
 
 	slog.Info("Start Uploading")
 	for i, row := range rows[req.DataRow-1:] {
@@ -57,14 +59,18 @@ func (r *ExcelRepo) Upload(ctx context.Context, f *excelize.File, req data_excel
 		}
 
 		if len(queryFields) == 0 {
-			return domain.ErrNoFields
+			return nil, domain.ErrNoFields
 		}
 
 		queryString := "INSERT INTO " + req.DBTable + " (" + strings.Join(queryFields, ", ") + ") " + "VALUES (" + strings.Join(queryValues, ", ") + ")"
 		_, err := r.db.ExecContext(ctx, queryString, queryParams...)
 		if err != nil {
+			slog.Error("Failed", "row", i+1)
 			slog.Error("Failed to execute query", "query", queryString, "params", queryParams)
-			return err
+			failedRows += "row: " + strconv.Itoa(i+1) + "\n" + err.Error() + "\n"
+			if !domain.IsDataTypeError(err.Error()) {
+				return nil, err
+			}
 		} else {
 			inserted++
 		}
@@ -73,10 +79,13 @@ func (r *ExcelRepo) Upload(ctx context.Context, f *excelize.File, req data_excel
 		queryValues = nil
 		queryParams = nil
 		valueCount = 1
-
-		slog.Info("INSERTED:", "row", i+1)
 	}
 
-	slog.Info("Successfully Uploaded!!!", "Total", len(rows[req.DataRow-1:]), "Inserted", inserted)
-	return nil
+	slog.Info("Successfully Uploaded!!!", "Total", total, "Inserted", inserted)
+	responseExcel := &data_excel.ResponseExcel{
+		Total:      total,
+		Inserted:   inserted,
+		FailedRows: failedRows,
+	}
+	return responseExcel, nil
 }

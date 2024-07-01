@@ -20,19 +20,20 @@ func NewExcelUseCase(uploader adapters.ExcelUploader) *ExcelUseCase {
 	}
 }
 
-func (uc *ExcelUseCase) Upload(ctx context.Context, f *excelize.File, req data_excel.RequestExcel) error {
+func (uc *ExcelUseCase) Upload(ctx context.Context, f *excelize.File, req data_excel.RequestExcel) (*data_excel.ResponseExcel, error) {
 	dto := make(map[string]string)
 	for _, data := range req.Fields {
 		_, ok := dto[data.Field]
 		if ok {
 			slog.Error("Already exists such field", "field", data.Field)
-			return errors.New(fmt.Sprintf("Already exists such field: %+v", data.Field))
+			return nil, errors.New(fmt.Sprintf("Already exists such field: %+v", data.Field))
 		} else {
 			dto[data.Field] = data.DB
 		}
 	}
-	if err := uc.uploader.Upload(ctx, f, req, dto); err != nil {
-		return err
+	res, err := uc.uploader.Upload(ctx, f, req, dto)
+	if err != nil {
+		return nil, err
 	}
-	return nil
+	return res, nil
 }

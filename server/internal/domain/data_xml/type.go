@@ -9,6 +9,12 @@ type Node struct {
 	Text     string `xml:",chardata"`
 }
 
+type ResponseXML struct {
+	Total      int64
+	Inserted   int64
+	FailedRows string
+}
+
 type RequestXML struct {
 	DBTable string `json:"db_table"`
 	Root    string `json:"root"`

@@ -21,12 +21,14 @@ func NewXMLRepo(db *sql.DB) *XMLRepo {
 	}
 }
 
-func (r *XMLRepo) Upload(ctx context.Context, dto map[string]data_xml.Tag, req data_xml.RequestXML, rows [][]data_xml.TagValue) error {
-	inserted := 0
+func (r *XMLRepo) Upload(ctx context.Context, dto map[string]data_xml.Tag, req data_xml.RequestXML, rows [][]data_xml.TagValue) (*data_xml.ResponseXML, error) {
+	inserted := int64(0)
+	total := int64(len(rows))
 	queryFields := make([]string, 0)
 	queryValues := make([]string, 0)
 	queryParams := make([]interface{}, 0)
 	valueCount := 1
+	failedRows := ""
 
 	slog.Info("Start Uploading")
 	for i, row := range rows {
@@ -41,15 +43,17 @@ func (r *XMLRepo) Upload(ctx context.Context, dto map[string]data_xml.Tag, req d
 		}
 		if len(queryFields) == 0 {
 			slog.Error("Failed to find appropriate tags", "index", i, "row", row)
-			return domain.ErrTagsNotFound
+			return nil, domain.ErrTagsNotFound
 		}
 
 		queryString := "INSERT INTO " + req.DBTable + " (" + strings.Join(queryFields, ", ") + ") " + "VALUES (" + strings.Join(queryValues, ", ") + ")"
 		_, err := r.db.ExecContext(ctx, queryString, queryParams...)
 		if err != nil {
+			slog.Error("Failed:", "row", i+1)
 			slog.Error("Failed to execute query", "query", queryString, "query params", queryParams, "error", err)
+			failedRows += "row: " + strconv.Itoa(i+1) + "\n" + err.Error() + "\n"
 			if !domain.IsDataTypeError(err.Error()) {
-				return err
+				return nil, err
 			}
 		} else {
 			inserted++
@@ -59,11 +63,13 @@ func (r *XMLRepo) Upload(ctx context.Context, dto map[string]data_xml.Tag, req d
 		queryValues = nil
 		queryParams = nil
 		valueCount = 1
-
-		slog.Info("INSERTED:", "row", i+1)
 	}
 
-	slog.Info("Successfully Uploaded!!!", "Total", len(rows), "Inserted", inserted)
-
-	return nil
+	slog.Info("Successfully Uploaded!!!", "Total", total, "Inserted", inserted)
+	responseXML := &data_xml.ResponseXML{
+		Total:      total,
+		Inserted:   inserted,
+		FailedRows: failedRows,
+	}
+	return responseXML, nil
 }

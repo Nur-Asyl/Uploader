@@ -1,8 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="5a8b9751-d680-49de-88ec-f9c805fc4a32" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/uploaders.components.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/internal/middleware/cors_mw/cors.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/internal/delivery/http_v1/delivery.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/internal/delivery/http_v1/delivery.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/internal/domain/data_excel/type.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/internal/domain/data_excel/type.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/internal/domain/data_xml/type.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/internal/domain/data_xml/type.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/internal/repository/excel_rep/repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/internal/repository/excel_rep/repository.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/internal/repository/xml_rep/repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/internal/repository/xml_rep/repository.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/internal/use_case/adapters/uploader.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/internal/use_case/adapters/uploader.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/internal/use_case/excel_uc/excel_usecase.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/internal/use_case/excel_uc/excel_usecase.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/internal/use_case/usecase.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/internal/use_case/usecase.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/internal/use_case/xml_uc/xml_usecase.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/internal/use_case/xml_uc/xml_usecase.go" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
+  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../../Program Files/Go" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="2iV7kO34rGNGkEANCbGrXJiNP0J" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Балауса/Desktop/snippetbox-1&quot;
+    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.automatic.dependencies.download&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Балауса/Desktop/Практика/Uploader&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
 }</component>
+  <component name="ReactDesignerToolWindowState">
+    <option name="myId2Visible">
+      <map>
+        <entry key="com.haulmont.rcb.reactComponents" value="false" />
+        <entry key="com.haulmont.rcb.reactInspector" value="false" />
+        <entry key="com.haulmont.rcb.storybook" value="false" />
+      </map>
+    </option>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VgoProject">
+    <settings-migrated>true</settings-migrated>
+  </component>
 </project>
